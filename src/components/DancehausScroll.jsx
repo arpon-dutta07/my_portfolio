@@ -9,6 +9,7 @@ const PhoenixScrollSection = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [particles, setParticles] = useState([]);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [sectionInView, setSectionInView] = useState(true);
 
   // Create particles
   useEffect(() => {
@@ -48,6 +49,16 @@ const PhoenixScrollSection = () => {
     };
   }, [showVideo]);
 
+  // Function to close video
+  const closeVideo = () => {
+    setShowVideo(false);
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
+    }
+  };
+
   // Handle scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -59,17 +70,19 @@ const PhoenixScrollSection = () => {
 
       setScrollProgress(progress);
 
-      const shouldShowVideo = progress >= 0.95;
+      // Check if section is in view
+      const isInView = rect.bottom > 0 && rect.top < window.innerHeight;
+      setSectionInView(isInView);
+
+      // Show video when progress reaches 95%
+      const shouldShowVideo = progress >= 0.95 && isInView;
 
       if (shouldShowVideo && !showVideo) {
         setShowVideo(true);
-      } else if (!shouldShowVideo && showVideo) {
-        setShowVideo(false);
-        const video = videoRef.current;
-        if (video) {
-          video.pause();
-          video.currentTime = 0;
-        }
+      } 
+      // Close video when scrolling out of section or progress drops
+      else if (showVideo && (!isInView || progress < 0.9)) {
+        closeVideo();
       }
     };
 
@@ -78,7 +91,7 @@ const PhoenixScrollSection = () => {
     handleScroll();
 
     return () => window.removeEventListener('scroll', onScroll);
-  }, [showVideo]);
+  }, [showVideo, sectionInView]);
 
   // Animate SVG path
   useEffect(() => {
@@ -146,6 +159,11 @@ const PhoenixScrollSection = () => {
             100% { background-position: 0% 50%; }
           }
           
+          @keyframes fadeOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.9); }
+          }
+          
           .floating-particle {
             position: absolute;
             width: 4px;
@@ -198,6 +216,10 @@ const PhoenixScrollSection = () => {
             backdrop-filter: blur(20px);
             background: rgba(0, 0, 0, 0.3);
           }
+          
+          .video-exit {
+            animation: fadeOut 0.5s ease-out forwards;
+          }
         `}
       </style>
 
@@ -216,6 +238,7 @@ const PhoenixScrollSection = () => {
             }}
           />
         )}
+        
         {/* Floating Particles Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {particles.map(particle => (
@@ -283,19 +306,20 @@ const PhoenixScrollSection = () => {
             
             {/* Close Button */}
             <button
-              onClick={() => {
-                setShowVideo(false);
-                const video = videoRef.current;
-                if (video) {
-                  video.pause();
-                  video.currentTime = 0;
-                }
-              }}
-              className="absolute top-6 right-6 w-12 h-12 bg-black bg-opacity-50 hover:bg-opacity-80 rounded-full flex items-center justify-center text-white text-2xl font-light transition-all duration-300 backdrop-blur-sm border border-white border-opacity-20 hover:border-opacity-40"
+              onClick={closeVideo}
+              className="absolute top-6 right-6 w-12 h-12 bg-black bg-opacity-50 hover:bg-opacity-80 rounded-full flex items-center justify-center text-white text-2xl font-light transition-all duration-300 backdrop-blur-sm border border-white border-opacity-20 hover:border-opacity-40 hover:scale-110"
               style={{ animation: 'fadeInScale 1s ease-out 0.3s both' }}
             >
               ×
             </button>
+            
+            {/* Additional instruction text */}
+            <div 
+              className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-white text-sm opacity-70"
+              style={{ animation: 'fadeInScale 1s ease-out 0.5s both' }}
+            >
+              Scroll to next section or click × to close
+            </div>
           </div>
         )}
 
