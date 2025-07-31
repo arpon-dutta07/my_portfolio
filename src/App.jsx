@@ -5,6 +5,8 @@ import About from './sections/About'
 import DancehausScroll from './components/DancehausScroll'
 import { SmoothCursor } from './components/SmoothCursor'
 import ParticleTextEffect from './components/ui/ParticleTextEffect'
+import CustomScrollBar from './components/CustomScrollBar'
+import Projects from './sections/Projects'
 
 
 
@@ -12,15 +14,17 @@ import ParticleTextEffect from './components/ui/ParticleTextEffect'
 const App = () => {
   return (
     <div className='box w-full h-full '>
+      <CustomScrollBar/>
     <div className='container mx-auto max-w-7xl'>
       <SmoothCursor/>
       <Navbar/>
-      <Hero/>      
+      <Hero/> 
+    </div>     
       <About/>
       <DancehausScroll/>
       <ParticleTextEffect/>
+      <Projects/>
 
-    </div>
     </div>
   )
 }
