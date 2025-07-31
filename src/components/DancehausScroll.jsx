@@ -24,30 +24,67 @@ const PhoenixScrollSection = () => {
     setParticles(newParticles);
   }, []);
 
-  // Video handling and cleanup
+  // ===== VIDEO OPTIMIZATION START =====
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleCanPlay = () => {
-      setIsVideoLoaded(true);
-      if (showVideo) {
-        video.play().catch(e => console.warn('Autoplay error:', e));
-      }
-    };
-
-    video.addEventListener('canplay', handleCanPlay);
-    video.preload = 'auto';
+    // Force preload and buffer the video
+    video.preload = "auto";
+    video.muted = true;
+    video.playsInline = true;
+    video.loop = true;
+    
+    // Create source element for better loading control
+    const source = document.createElement('source');
+    source.src = "/assets/video10.mp4";
+    source.type = "video/mp4";
+    video.appendChild(source);
     video.load();
 
+    const handleCanPlay = () => {
+      setIsVideoLoaded(true);
+      // Warm up the video decoder by playing/pausing
+      video.play()
+        .then(() => {
+          video.pause();
+          video.currentTime = 0;
+        })
+        .catch(e => console.log("Video warmup:", e));
+    };
+
+    video.addEventListener('canplaythrough', handleCanPlay);
+
     return () => {
-      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('canplaythrough', handleCanPlay);
       video.pause();
       video.currentTime = 0;
-      video.removeAttribute('src');
-      video.load();
     };
-  }, [showVideo]);
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isVideoLoaded) return;
+
+    if (showVideo) {
+      // Ensure smooth playback start
+      video.currentTime = 0;
+      const playPromise = video.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch(e => {
+          console.log("Playback failed, trying muted:", e);
+          video.muted = true;
+          video.play().catch(e => console.log("Muted playback failed:", e));
+        });
+      }
+    } else {
+      // Reset video when not showing
+      video.pause();
+      video.currentTime = 0;
+    }
+  }, [showVideo, isVideoLoaded]);
+  // ===== VIDEO OPTIMIZATION END =====
 
   // Function to close video
   const closeVideo = () => {
@@ -69,19 +106,13 @@ const PhoenixScrollSection = () => {
       const progress = Math.max(0, Math.min(1, (scrollStart - rect.top) / (scrollEnd - scrollStart)));
 
       setScrollProgress(progress);
-
-      // Check if section is in view
       const isInView = rect.bottom > 0 && rect.top < window.innerHeight;
       setSectionInView(isInView);
 
-      // Show video when progress reaches 95%
       const shouldShowVideo = progress >= 0.95 && isInView;
-
       if (shouldShowVideo && !showVideo) {
         setShowVideo(true);
-      } 
-      // Close video when scrolling out of section or progress drops
-      else if (showVideo && (!isInView || progress < 0.9)) {
+      } else if (showVideo && (!isInView || progress < 0.9)) {
         closeVideo();
       }
     };
@@ -96,11 +127,9 @@ const PhoenixScrollSection = () => {
   // Animate SVG path
   useEffect(() => {
     if (!pathRef.current) return;
-
     const path = pathRef.current;
     const pathLength = path.getTotalLength();
     const offset = pathLength * (1 - scrollProgress);
-
     const hue = Math.floor(scrollProgress * 300 + 260);
     const saturation = 80 + scrollProgress * 20;
     const lightness = 50 + scrollProgress * 20;
@@ -117,8 +146,7 @@ const PhoenixScrollSection = () => {
   }, [scrollProgress]);
 
   const galaxyImage = "/assets/galaxy.jpg";
-  const videoSource = "/assets/video10.mp4";
-  
+
   return (
     <>
       <style>
@@ -294,14 +322,11 @@ const PhoenixScrollSection = () => {
               muted
               playsInline
               loop
-              preload="auto"
               autoPlay
               disablePictureInPicture
               disableRemotePlayback
-              onLoadedData={() => setIsVideoLoaded(true)}
-              onError={() => setIsVideoLoaded(false)}
             >
-              <source src={videoSource} type="video/mp4" />
+              <source src="/assets/video10.mp4" type="video/mp4" />
             </video>
             
             {/* Close Button */}
