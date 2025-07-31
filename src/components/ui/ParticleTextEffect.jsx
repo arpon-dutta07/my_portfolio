@@ -140,6 +140,7 @@ export default function ParticleTextEffect({ words = DEFAULT_WORDS }) {
   const frameCountRef = useRef(0);
   const wordIndexRef = useRef(0);
   const mouseRef = useRef({ x: 0, y: 0, isPressed: false, isRightClick: false });
+  const rainbowTimeRef = useRef(0);
 
   const pixelSteps = 6;
   const drawAsPoints = true;
@@ -163,6 +164,12 @@ export default function ParticleTextEffect({ words = DEFAULT_WORDS }) {
       x: x + direction.x,
       y: y + direction.y,
     };
+  };
+
+  // Function to create rainbow HSL color
+  const getRainbowColor = (time, offset = 0) => {
+    const hue = ((time * 50 + offset * 60) % 360);
+    return `hsl(${hue}, 100%, 50%)`;
   };
 
   const nextWord = (word, canvas) => {
@@ -259,6 +266,9 @@ export default function ParticleTextEffect({ words = DEFAULT_WORDS }) {
 
     const ctx = canvas.getContext("2d");
     const particles = particlesRef.current;
+
+    // Update rainbow time
+    rainbowTimeRef.current += 0.02;
 
     // Background with motion blur
     ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
@@ -360,11 +370,149 @@ export default function ParticleTextEffect({ words = DEFAULT_WORDS }) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
-      <canvas
-        ref={canvasRef}
-        className="border border-gray-800 rounded-lg shadow-2xl"
-        style={{ maxWidth: "100%", height: "auto" }}
-      />
+      <div 
+        className="relative"
+        style={{
+          background: `conic-gradient(
+            from ${rainbowTimeRef.current * 100}deg,
+            #ff0000 0deg,
+            #ff8800 60deg,
+            #ffff00 120deg,
+            #88ff00 180deg,
+            #00ff00 240deg,
+            #00ff88 300deg,
+            #00ffff 360deg,
+            #0088ff 420deg,
+            #0000ff 480deg,
+            #8800ff 540deg,
+            #ff00ff 600deg,
+            #ff0088 660deg,
+            #ff0000 720deg
+          )`,
+          padding: '4px',
+          borderRadius: '12px',
+          animation: 'rainbow-rotate 3s linear infinite'
+        }}
+      >
+        <style jsx>{`
+          @keyframes rainbow-rotate {
+            0% { 
+              background: conic-gradient(
+                from 0deg,
+                #ff0000 0deg,
+                #ff8800 60deg,
+                #ffff00 120deg,
+                #88ff00 180deg,
+                #00ff00 240deg,
+                #00ff88 300deg,
+                #00ffff 360deg
+              );
+            }
+            25% { 
+              background: conic-gradient(
+                from 90deg,
+                #ff0000 0deg,
+                #ff8800 60deg,
+                #ffff00 120deg,
+                #88ff00 180deg,
+                #00ff00 240deg,
+                #00ff88 300deg,
+                #00ffff 360deg
+              );
+            }
+            50% { 
+              background: conic-gradient(
+                from 180deg,
+                #ff0000 0deg,
+                #ff8800 60deg,
+                #ffff00 120deg,
+                #88ff00 180deg,
+                #00ff00 240deg,
+                #00ff88 300deg,
+                #00ffff 360deg
+              );
+            }
+            75% { 
+              background: conic-gradient(
+                from 270deg,
+                #ff0000 0deg,
+                #ff8800 60deg,
+                #ffff00 120deg,
+                #88ff00 180deg,
+                #00ff00 240deg,
+                #00ff88 300deg,
+                #00ffff 360deg
+              );
+            }
+            100% { 
+              background: conic-gradient(
+                from 360deg,
+                #ff0000 0deg,
+                #ff8800 60deg,
+                #ffff00 120deg,
+                #88ff00 180deg,
+                #00ff00 240deg,
+                #00ff88 300deg,
+                #00ffff 360deg
+              );
+            }
+          }
+          
+          @keyframes rainbow-glow {
+            0% { 
+              box-shadow: 
+                0 0 20px #ff0000,
+                0 0 40px #ff0000,
+                0 0 60px #ff0000;
+            }
+            16.67% { 
+              box-shadow: 
+                0 0 20px #ffff00,
+                0 0 40px #ffff00,
+                0 0 60px #ffff00;
+            }
+            33.33% { 
+              box-shadow: 
+                0 0 20px #00ff00,
+                0 0 40px #00ff00,
+                0 0 60px #00ff00;
+            }
+            50% { 
+              box-shadow: 
+                0 0 20px #00ffff,
+                0 0 40px #00ffff,
+                0 0 60px #00ffff;
+            }
+            66.67% { 
+              box-shadow: 
+                0 0 20px #0000ff,
+                0 0 40px #0000ff,
+                0 0 60px #0000ff;
+            }
+            83.33% { 
+              box-shadow: 
+                0 0 20px #ff00ff,
+                0 0 40px #ff00ff,
+                0 0 60px #ff00ff;
+            }
+            100% { 
+              box-shadow: 
+                0 0 20px #ff0000,
+                0 0 40px #ff0000,
+                0 0 60px #ff0000;
+            }
+          }
+        `}</style>
+        <canvas
+          ref={canvasRef}
+          className="rounded-lg shadow-2xl bg-black"
+          style={{ 
+            maxWidth: "100%", 
+            height: "auto",
+            animation: 'rainbow-glow 2s ease-in-out infinite',
+          }}
+        />
+      </div>
       <div className="mt-4 text-white text-sm text-center max-w-md">
         <p className="mb-2">Particle Text Effect</p>
         <p className="text-gray-400 text-xs">
