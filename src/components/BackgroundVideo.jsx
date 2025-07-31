@@ -17,7 +17,7 @@ const BackgroundVideo = ({ videoSrc, fallbackImage, children }) => {
   }, []);
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full h-full">
       {/* Video Element */}
       <video
         ref={videoRef}
