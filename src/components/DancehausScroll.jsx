@@ -10,6 +10,7 @@ const PhoenixScrollSection = () => {
   const [particles, setParticles] = useState([]);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [sectionInView, setSectionInView] = useState(true);
+  const [showPlayButton, setShowPlayButton] = useState(false);
 
   // Create particles
   useEffect(() => {
@@ -24,7 +25,7 @@ const PhoenixScrollSection = () => {
     setParticles(newParticles);
   }, []);
 
-  // Video handling and cleanup
+  // Enhanced video handling for mobile and desktop
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -32,16 +33,47 @@ const PhoenixScrollSection = () => {
     const handleCanPlay = () => {
       setIsVideoLoaded(true);
       if (showVideo) {
-        video.play().catch(e => console.warn('Autoplay error:', e));
+        // Enhanced mobile compatibility
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              // Video started successfully
+              console.log('Video playing successfully');
+              setShowPlayButton(false);
+            })
+            .catch(error => {
+              console.warn('Autoplay prevented:', error);
+              // Show manual play button for mobile
+              setShowPlayButton(true);
+              setIsVideoLoaded(true);
+            });
+        }
       }
     };
 
+    const handleLoadedData = () => {
+      setIsVideoLoaded(true);
+    };
+
+    const handleError = (e) => {
+      console.error('Video error:', e);
+      setIsVideoLoaded(false);
+    };
+
+    // Enhanced event listeners
     video.addEventListener('canplay', handleCanPlay);
-    video.preload = 'auto';
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('error', handleError);
+    
+    // Better mobile support
+    video.preload = 'metadata'; // Changed from 'auto' for better mobile performance
     video.load();
 
     return () => {
       video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('error', handleError);
       video.pause();
       video.currentTime = 0;
       video.removeAttribute('src');
@@ -51,11 +83,31 @@ const PhoenixScrollSection = () => {
 
   // Function to close video
   const closeVideo = () => {
-    setShowVideo(false);
     const video = videoRef.current;
     if (video) {
       video.pause();
       video.currentTime = 0;
+      // Force stop all video processes
+      video.src = '';
+      video.removeAttribute('src');
+      video.load();
+    }
+    setShowVideo(false);
+    setShowPlayButton(false);
+    setIsVideoLoaded(false);
+  };
+
+  // Manual play function for mobile
+  const handleManualPlay = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.play()
+        .then(() => {
+          setShowPlayButton(false);
+        })
+        .catch(error => {
+          console.error('Manual play failed:', error);
+        });
     }
   };
 
@@ -265,7 +317,7 @@ const PhoenixScrollSection = () => {
         >
           <path
             ref={pathRef}
-            d="M80 200 C150 120, 250 120, 320 200 C350 230, 380 260, 420 280 C480 310, 540 320, 600 300 C680 270, 720 240, 780 260 C840 280, 880 320, 920 360 C950 390, 980 420, 1000 450 C1020 480, 1040 510, 1050 550 C1060 590, 1050 630, 1020 660 C990 690, 950 700, 900 690 C850 680, 800 660, 760 630 C720 600, 690 570, 650 540 C610 510, 570 480, 520 460 C470 440, 420 430, 370 440 C320 450, 280 470, 250 500 C220 530, 200 570, 190 610"
+            d="M0 400 C50 350, 100 300, 150 320 C200 340, 250 120, 320 200 C350 230, 380 260, 420 280 C480 310, 540 320, 600 300 C680 270, 720 240, 780 260 C840 280, 880 320, 920 360 C950 390, 980 420, 1000 450 C1020 480, 1040 510, 1050 550 C1060 590, 1050 630, 1020 660 C990 690, 950 700, 900 690 C850 680, 800 660, 760 630 C720 600, 690 570, 650 540 C610 510, 570 480, 520 460 C470 440, 420 430, 370 440 C320 450, 280 470, 250 500 C220 530, 200 570, 150 580 C100 590, 50 550, 0 400"
             stroke="#a855f7"
             strokeWidth="10"
             fill="none"
@@ -294,20 +346,61 @@ const PhoenixScrollSection = () => {
               muted
               playsInline
               loop
-              preload="auto"
+              preload="metadata"
               autoPlay
               disablePictureInPicture
               disableRemotePlayback
+              webkit-playsinline="true"
+              x5-playsinline="true"
+              x5-video-player-type="h5"
+              x5-video-player-fullscreen="true"
+              x-webkit-airplay="allow"
               onLoadedData={() => setIsVideoLoaded(true)}
               onError={() => setIsVideoLoaded(false)}
+              onCanPlay={() => {
+                const video = videoRef.current;
+                if (video && showVideo) {
+                  video.play().catch(e => console.warn('Mobile autoplay prevented:', e));
+                }
+              }}
+              style={{
+                objectFit: 'cover',
+                width: '100%',
+                height: '100%',
+                backgroundColor: '#000'
+              }}
             >
               <source src={videoSource} type="video/mp4" />
+              <p className="text-white text-center p-4">
+                Your browser doesn't support HTML5 video. 
+                <a href={videoSource} className="text-blue-400 underline ml-2">
+                  Download the video instead.
+                </a>
+              </p>
             </video>
             
+            {/* Manual Play Button for Mobile */}
+            {showPlayButton && (
+              <button
+                onClick={handleManualPlay}
+                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 backdrop-blur-sm transition-all duration-300 hover:bg-opacity-40"
+                style={{ animation: 'fadeInScale 0.5s ease-out' }}
+              >
+                <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center border-2 border-white border-opacity-40 hover:border-opacity-60 hover:scale-110 transition-all duration-300">
+                  <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+                <div className="absolute bottom-20 text-white text-lg font-light">
+                  Tap to play video
+                </div>
+              </button>
+            )}
+
             {/* Close Button */}
             <button
               onClick={closeVideo}
-              className="absolute top-6 right-6 w-12 h-12 bg-black bg-opacity-50 hover:bg-opacity-80 rounded-full flex items-center justify-center text-white text-2xl font-light transition-all duration-300 backdrop-blur-sm border border-white border-opacity-20 hover:border-opacity-40 hover:scale-110"
+              className="absolute top-6 right-6 w-12 h-12 bg-black bg-opacity-50 hover:bg-opacity-80 rounded-full flex items-center justify-center text-white text-2xl font-light transition-all duration-300 backdrop-blur-sm border border-white border-opacity-20 hover:border-opacity-40 hover:scale-110 z-10"
               style={{ animation: 'fadeInScale 1s ease-out 0.3s both' }}
             >
               ×
@@ -372,7 +465,7 @@ const PhoenixScrollSection = () => {
                   animation: showVideo ? 'slideInRight 0.8s ease-out' : 'none',
                 }}
               >
-                About Me
+                Creative Excellence
               </h1>
               
               <div className="space-y-6 text-lg text-gray-300 leading-relaxed">
@@ -383,7 +476,7 @@ const PhoenixScrollSection = () => {
                     transition: 'opacity 0.5s ease'
                   }}
                 >
-                  I'm a creative professional passionate about crafting digital experiences that tell compelling stories through design and technology.
+                  Transforming concepts into stunning 3D visuals through advanced modeling and rendering techniques.
                 </p>
                 <p 
                   style={{ 
@@ -392,7 +485,7 @@ const PhoenixScrollSection = () => {
                     transition: 'opacity 0.5s ease'
                   }}
                 >
-                  My work focuses on creating meaningful connections between brands and their audiences through innovative visual storytelling.
+                  Expertise in Blender, Cinema 4D, and Maya for creating photorealistic architectural visualizations and conceptual art.
                 </p>
                 <p 
                   style={{ 
@@ -401,7 +494,7 @@ const PhoenixScrollSection = () => {
                     transition: 'opacity 0.5s ease'
                   }}
                 >
-                  Every project is an opportunity to explore new creative possibilities and push the boundaries of what's possible.
+                  Pushing creative boundaries with dynamic lighting, particle systems, and procedural generation techniques.
                 </p>
               </div>
               
