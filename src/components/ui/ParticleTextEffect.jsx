@@ -514,7 +514,7 @@ export default function ParticleTextEffect({ words = DEFAULT_WORDS }) {
         />
       </div>
       <div className="mt-4 text-white text-sm text-center max-w-md">
-        <p className="mb-2">Particle Text Effect</p>
+        <p className="mb-2"></p>
         <p className="text-gray-400 text-xs">
           Right-click and hold while moving mouse to destroy particles • Words change automatically every 4 seconds
         </p>
