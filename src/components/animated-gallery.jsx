@@ -489,7 +489,7 @@ export default function MyGallery() {
                   backgroundSize: "200% 200%",
                 }}
               >
-                MY GALLERY
+                Edited Photography Showcase
               </motion.span>
             </motion.h1>
             
@@ -506,7 +506,7 @@ export default function MyGallery() {
                 ease: "easeInOut",
               }}
             >
-              MY GALLERY
+              Edited Photography Showcase
             </motion.h1>
           </motion.div>
 
