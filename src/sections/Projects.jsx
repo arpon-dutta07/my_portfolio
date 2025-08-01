@@ -5,11 +5,11 @@ import { motion, useMotionValue, useSpring } from "motion/react";
 const Projects = () => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const springX = useSpring(x, { damping: 10, stiffness: 50 });
-  const springY = useSpring(y, { damping: 10, stiffness: 50 });
+  const springX = useSpring(x, { damping: 30, stiffness: 150, mass: 0.5 });
+  const springY = useSpring(y, { damping: 30, stiffness: 150, mass: 0.5 });
   const handleMouseMove = (e) => {
-    x.set(e.clientX + 20);
-    y.set(e.clientY + 20);
+    x.set(e.clientX + 15);
+    y.set(e.clientY - 50);
   };
   const [preview, setPreview] = useState(null);
   return (
