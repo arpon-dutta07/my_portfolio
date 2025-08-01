@@ -7,7 +7,7 @@ import { SmoothCursor } from './components/SmoothCursor'
 import ParticleTextEffect from './components/ui/ParticleTextEffect'
 import CustomScrollBar from './components/CustomScrollBar'
 import Projects from './sections/Projects'
-
+import MyGallery from './components/animated-gallery'
 
 
 
@@ -24,6 +24,11 @@ const App = () => {
       <DancehausScroll/>
       <ParticleTextEffect/>
       <Projects/>
+      <MyGallery/>
+
+      
+
+
 
     </div>
   )
