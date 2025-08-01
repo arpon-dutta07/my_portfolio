@@ -8,6 +8,7 @@ import ParticleTextEffect from './components/ui/ParticleTextEffect'
 import CustomScrollBar from './components/CustomScrollBar'
 import Projects from './sections/Projects'
 import MyGallery from './components/animated-gallery'
+import InteractiveGallery from './components/InteractiveDoubleImage'
 
 
 
@@ -25,6 +26,7 @@ const App = () => {
       <ParticleTextEffect/>
       <Projects/>
       <MyGallery/>
+      <InteractiveGallery/>
 
       
 
