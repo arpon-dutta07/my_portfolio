@@ -3,11 +3,11 @@ import { motion, useScroll, useTransform, useSpring, useMotionValue, useAnimatio
 
 const SPRING_CONFIG = {
   type: "spring",
-  stiffness: 100,
-  damping: 16,
-  mass: 0.75,
-  restDelta: 0.005,
-  duration: 0.3,
+  stiffness: 120,
+  damping: 18,
+  mass: 0.6,
+  restDelta: 0.001,
+  duration: 0.4,
 };
 
 const blurVariants = {
@@ -187,13 +187,26 @@ function GalleryContainer({
   ...props
 }) {
   const { scrollYProgress } = useContainerScrollContext();
-  const rotateX = useTransform(scrollYProgress, [0, 0.5], [75, 0]);
-  const scale = useTransform(scrollYProgress, [0.5, 0.9], [1.2, 1]);
-  const rotateY = useTransform(scrollYProgress, [0, 1], [0, 5]);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Reduce 3D effects on mobile for better performance
+  const rotateX = useTransform(scrollYProgress, [0, 0.5], isMobile ? [30, 0] : [75, 0]);
+  const scale = useTransform(scrollYProgress, [0.5, 0.9], isMobile ? [1.1, 1] : [1.2, 1]);
+  const rotateY = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 2] : [0, 5]);
 
   return (
     <motion.div
-      className={`relative grid size-full grid-cols-3 gap-2 rounded-2xl ${className || ''}`}
+      className={`relative grid size-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 sm:gap-2 rounded-2xl ${className || ''}`}
       style={{
         rotateX,
         rotateY,
@@ -234,8 +247,21 @@ function GalleryCol({
 function EnhancedImage({ src, alt, index, colorTheme }) {
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   const handleMouseMove = (e) => {
+    if (isMobile) return; // Disable mouse tracking on mobile
+    
     const rect = e.currentTarget.getBoundingClientRect();
     setMousePosition({
       x: ((e.clientX - rect.left) / rect.width) * 100,
@@ -246,25 +272,29 @@ function EnhancedImage({ src, alt, index, colorTheme }) {
   return (
     <motion.div
       className="relative group cursor-pointer"
-      initial={{ opacity: 0, y: 50, rotateX: 45 }}
+      initial={{ opacity: 0, y: isMobile ? 20 : 50, rotateX: isMobile ? 15 : 45 }}
       whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
       transition={{ 
-        duration: 0.8, 
-        delay: index * 0.1,
+        duration: isMobile ? 0.6 : 0.8, 
+        delay: index * (isMobile ? 0.05 : 0.1),
         type: "spring",
-        stiffness: 100,
-        damping: 20
+        stiffness: isMobile ? 150 : 100,
+        damping: isMobile ? 25 : 20
       }}
       viewport={{ once: true }}
-      whileHover={{ 
+      whileHover={isMobile ? { 
+        scale: 1.02,
+        transition: { duration: 0.3, type: "spring", stiffness: 400, damping: 25 }
+      } : { 
         scale: 1.08, 
         z: 20,
         rotateY: 5,
         rotateX: -5,
         transition: { duration: 0.4, type: "spring", stiffness: 300, damping: 20 }
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      whileTap={isMobile ? { scale: 0.98 } : {}}
+      onMouseEnter={() => !isMobile && setIsHovered(true)}
+      onMouseLeave={() => !isMobile && setIsHovered(false)}
       onMouseMove={handleMouseMove}
       style={{
         transformStyle: "preserve-3d",
@@ -274,29 +304,31 @@ function EnhancedImage({ src, alt, index, colorTheme }) {
       <motion.div
         className={`absolute -inset-1 rounded-xl blur-md opacity-0 group-hover:opacity-100 bg-gradient-to-r ${colorTheme}`}
         animate={{
-          scale: isHovered ? [1, 1.05, 1] : 1,
-          rotate: isHovered ? [0, 2, -2, 0] : 0,
+          scale: (isHovered && !isMobile) ? [1, 1.05, 1] : 1,
+          rotate: (isHovered && !isMobile) ? [0, 2, -2, 0] : 0,
         }}
         transition={{
-          duration: 2,
-          repeat: isHovered ? Infinity : 0,
+          duration: isMobile ? 1 : 2,
+          repeat: (isHovered && !isMobile) ? Infinity : 0,
           repeatType: "reverse",
         }}
       />
       
-      {/* Shimmer effect */}
-      <motion.div
-        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100"
-        animate={{
-          background: isHovered 
-            ? [
-              "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)",
-              "linear-gradient(225deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)"
-            ]
-            : "transparent"
-        }}
-        transition={{ duration: 1.5, repeat: isHovered ? Infinity : 0 }}
-      />
+      {/* Shimmer effect - disabled on mobile for performance */}
+      {!isMobile && (
+        <motion.div
+          className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100"
+          animate={{
+            background: isHovered 
+              ? [
+                "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)",
+                "linear-gradient(225deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)"
+              ]
+              : "transparent"
+          }}
+          transition={{ duration: 1.5, repeat: isHovered ? Infinity : 0 }}
+        />
+      )}
 
       {/* Main image */}
       <motion.img
@@ -304,30 +336,32 @@ function EnhancedImage({ src, alt, index, colorTheme }) {
         src={src}
         alt={alt}
         style={{
-          filter: isHovered ? "brightness(1.1) contrast(1.1) saturate(1.2)" : "brightness(1)",
+          filter: (isHovered && !isMobile) ? "brightness(1.1) contrast(1.1) saturate(1.2)" : "brightness(1)",
         }}
-        whileHover={{
+        whileHover={!isMobile ? {
           filter: "brightness(1.2) contrast(1.2) saturate(1.3)",
-        }}
-        transition={{ duration: 0.3 }}
+        } : {}}
+        transition={{ duration: isMobile ? 0.2 : 0.3 }}
       />
 
-      {/* Interactive light following mouse */}
-      <motion.div
-        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none"
-        style={{
-          background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(255,255,255,0.3) 0%, transparent 50%)`,
-        }}
-        animate={{
-          opacity: isHovered ? [0.3, 0.6, 0.3] : 0,
-        }}
-        transition={{ duration: 2, repeat: isHovered ? Infinity : 0 }}
-      />
+      {/* Interactive light following mouse - desktop only */}
+      {!isMobile && (
+        <motion.div
+          className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(255,255,255,0.3) 0%, transparent 50%)`,
+          }}
+          animate={{
+            opacity: isHovered ? [0.3, 0.6, 0.3] : 0,
+          }}
+          transition={{ duration: 2, repeat: isHovered ? Infinity : 0 }}
+        />
+      )}
 
-      {/* Particle explosion on hover */}
+      {/* Particle explosion on hover - reduced on mobile */}
       {isHovered && (
         <div className="absolute inset-0 pointer-events-none">
-          {Array.from({ length: 12 }).map((_, i) => (
+          {Array.from({ length: isMobile ? 6 : 12 }).map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-1 h-1 bg-white rounded-full"
@@ -338,15 +372,15 @@ function EnhancedImage({ src, alt, index, colorTheme }) {
               initial={{ scale: 0, x: 0, y: 0 }}
               animate={{
                 scale: [0, 1, 0],
-                x: [(Math.random() - 0.5) * 100, (Math.random() - 0.5) * 200],
-                y: [(Math.random() - 0.5) * 100, (Math.random() - 0.5) * 200],
+                x: [(Math.random() - 0.5) * (isMobile ? 50 : 100), (Math.random() - 0.5) * (isMobile ? 100 : 200)],
+                y: [(Math.random() - 0.5) * (isMobile ? 50 : 100), (Math.random() - 0.5) * (isMobile ? 100 : 200)],
                 opacity: [0, 1, 0],
               }}
               transition={{
-                duration: 1.5,
+                duration: isMobile ? 1 : 1.5,
                 delay: i * 0.1,
                 repeat: Infinity,
-                repeatDelay: 2,
+                repeatDelay: isMobile ? 1.5 : 2,
               }}
             />
           ))}
@@ -357,18 +391,18 @@ function EnhancedImage({ src, alt, index, colorTheme }) {
       <motion.div
         className={`absolute inset-0 bg-gradient-to-br ${colorTheme} rounded-xl opacity-0 group-hover:opacity-20 mix-blend-overlay`}
         animate={{
-          opacity: isHovered ? [0.1, 0.3, 0.1] : 0,
+          opacity: (isHovered && !isMobile) ? [0.1, 0.3, 0.1] : 0,
         }}
-        transition={{ duration: 1.5, repeat: isHovered ? Infinity : 0 }}
+        transition={{ duration: isMobile ? 1 : 1.5, repeat: (isHovered && !isMobile) ? Infinity : 0 }}
       />
 
       {/* Ring effect */}
       <motion.div
         className={`absolute inset-0 ring-2 ring-purple-400/0 group-hover:ring-purple-400/70 rounded-xl`}
         animate={{
-          scale: isHovered ? [1, 1.02, 1] : 1,
+          scale: (isHovered && !isMobile) ? [1, 1.02, 1] : 1,
         }}
-        transition={{ duration: 2, repeat: isHovered ? Infinity : 0 }}
+        transition={{ duration: isMobile ? 1 : 2, repeat: (isHovered && !isMobile) ? Infinity : 0 }}
       />
     </motion.div>
   );
@@ -400,19 +434,32 @@ export default function MyGallery() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const [stars, setStars] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Generate stars
+  // Check if device is mobile
   useEffect(() => {
-    const newStars = Array.from({ length: 100 }).map((_, i) => ({
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Generate stars - fewer on mobile for performance
+  useEffect(() => {
+    const starCount = isMobile ? 50 : 100;
+    const newStars = Array.from({ length: starCount }).map((_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: Math.random() * 3 + 1,
+      size: Math.random() * (isMobile ? 2 : 3) + 1,
       opacity: Math.random() * 0.8 + 0.2,
       animationDuration: Math.random() * 3 + 2,
     }));
     setStars(newStars);
-  }, []);
+  }, [isMobile]);
 
   return (
     <div className="relative bg-black min-h-screen overflow-hidden">
@@ -459,21 +506,21 @@ export default function MyGallery() {
         }}
       />
 
-      {/* Floating orbs */}
-      <FloatingOrbs />
+      {/* Floating orbs - reduced on mobile */}
+      {!isMobile && <FloatingOrbs />}
 
-      {/* Mouse ripple effect */}
-      <RippleEffect mouseX={mouseX} mouseY={mouseY} />
+      {/* Mouse ripple effect - desktop only */}
+      {!isMobile && <RippleEffect mouseX={mouseX} mouseY={mouseY} />}
 
       <ContainerScroll>
-        <div className="flex flex-col items-center justify-center py-20">
+        <div className="flex flex-col items-center justify-center py-10 md:py-16 lg:py-20 px-2 md:px-4">
           {/* Spectacular title with multiple effects */}
-          <motion.div className="relative mb-20">
+          <motion.div className="relative mb-10 md:mb-16 lg:mb-20">
             <motion.h1 
-              className="text-8xl font-black text-center relative z-10"
-              initial={{ opacity: 0, y: 50, scale: 0.5 }}
+              className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-center relative z-10 px-2"
+              initial={{ opacity: 0, y: isMobile ? 20 : 50, scale: isMobile ? 0.8 : 0.5 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 1.5, ease: "easeOut" }}
+              transition={{ duration: isMobile ? 1 : 1.5, ease: "easeOut" }}
             >
               <motion.span
                 className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
@@ -493,15 +540,15 @@ export default function MyGallery() {
               </motion.span>
             </motion.h1>
             
-            {/* Glowing shadow */}
+            {/* Glowing shadow - reduced on mobile */}
             <motion.h1 
-              className="absolute inset-0 text-8xl font-black text-center text-purple-400 blur-lg opacity-50"
+              className="absolute inset-0 text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-center text-purple-400 blur-lg opacity-50 px-2"
               animate={{
-                scale: [1, 1.05, 1],
-                opacity: [0.3, 0.7, 0.3],
+                scale: [1, isMobile ? 1.02 : 1.05, 1],
+                opacity: [0.3, isMobile ? 0.5 : 0.7, 0.3],
               }}
               transition={{
-                duration: 2,
+                duration: isMobile ? 1.5 : 2,
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
@@ -511,21 +558,21 @@ export default function MyGallery() {
           </motion.div>
 
           {/* Animated divider */}
-          <motion.div className="relative mb-20">
+          <motion.div className="relative mb-10 md:mb-16 lg:mb-20">
             <motion.div
-              className="w-64 h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent mx-auto rounded-full"
+              className="w-32 sm:w-48 md:w-64 h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent mx-auto rounded-full"
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 256, opacity: 1 }}
-              transition={{ duration: 2, delay: 0.5, ease: "easeOut" }}
+              animate={{ width: isMobile ? 128 : 256, opacity: 1 }}
+              transition={{ duration: isMobile ? 1.5 : 2, delay: 0.5, ease: "easeOut" }}
             />
             <motion.div
-              className="absolute inset-0 w-64 h-1 bg-gradient-to-r from-purple-400 to-pink-400 mx-auto rounded-full blur-sm"
+              className="absolute inset-0 w-32 sm:w-48 md:w-64 h-1 bg-gradient-to-r from-purple-400 to-pink-400 mx-auto rounded-full blur-sm"
               animate={{
                 opacity: [0.5, 1, 0.5],
-                scale: [1, 1.1, 1],
+                scale: [1, isMobile ? 1.05 : 1.1, 1],
               }}
               transition={{
-                duration: 2,
+                duration: isMobile ? 1.5 : 2,
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
@@ -533,8 +580,8 @@ export default function MyGallery() {
           </motion.div>
           
           <ContainerSticky>
-            <GalleryContainer className="p-8">
-              <GalleryCol yRange={["0%", "-15%"]}>
+            <GalleryContainer className="p-2 sm:p-4 md:p-6 lg:p-8">
+              <GalleryCol yRange={isMobile ? ["0%", "-5%"] : ["0%", "-15%"]} className="sm:block">
                 {IMAGES_1.map((imageUrl, index) => (
                   <EnhancedImage
                     key={index}
@@ -545,7 +592,7 @@ export default function MyGallery() {
                   />
                 ))}
               </GalleryCol>
-              <GalleryCol yRange={["0%", "-5%"]}>
+              <GalleryCol yRange={isMobile ? ["0%", "-2%"] : ["0%", "-5%"]} className="hidden sm:block">
                 {IMAGES_2.map((imageUrl, index) => (
                   <EnhancedImage
                     key={index}
@@ -556,7 +603,7 @@ export default function MyGallery() {
                   />
                 ))}
               </GalleryCol>
-              <GalleryCol yRange={["0%", "-10%"]}>
+              <GalleryCol yRange={isMobile ? ["0%", "-3%"] : ["0%", "-10%"]} className="hidden lg:block">
                 {IMAGES_3.map((imageUrl, index) => (
                   <EnhancedImage
                     key={index}

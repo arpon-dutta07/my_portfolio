@@ -122,36 +122,64 @@ export const mySocials = [
 
 export const experiences = [
   {
-    title: "Software Developer",
-    job: "Security & Defense Projects",
-    date: "2021-2023",
+    title: "Graphics Designer",
+    job: "Self-Employed",
+    date: "2020-2021",
     contents: [
-      "Enhanced application security and developed new features, adhering to standards set by the Passive Defense Organization and National Cyberspace Center.",
-      "Designed and implemented intuitive map interfaces using MapsUI, enhancing user experience and enabling seamless interactive map integration.",
-      "Developed applications for industrial automation, leveraging C++ and the Fatek API for PLC communication.",
-      "Enhanced responsiveness and usability of applications using Windows Forms and WPF frameworks.",
-      "Executed XML to SVG conversions using X-DOM, ensuring dynamic and efficient data visualization.",
+      "Crafted visually compelling brand identities and marketing materials, helping clients establish strong market presence through innovative design solutions.",
+      "Collaborated closely with diverse clients to understand their vision and translate concepts into stunning visual narratives that resonated with target audiences.",
+      "Mastered industry-standard design tools including Adobe Creative Suite, developing expertise in typography, color theory, and composition principles.",
+      "Successfully delivered over 50+ design projects on time and within budget, maintaining exceptional client satisfaction and fostering long-term partnerships.",
+      "Developed a keen eye for detail and aesthetic excellence, ensuring every design element served both functional and artistic purposes.",
+    ],
+  },
+
+  {
+    title: "Video Editor",
+    job: "Self-Employed", 
+    date: "2021-2022",
+    contents: [
+      "Produced engaging video content for social media platforms, YouTube channels, and corporate presentations, significantly boosting client engagement rates.",
+      "Expertly utilized professional editing software including CapCUt, VN-editor, and DaVinci Resolve to create polished, high-quality productions.",
+      "Collaborated with content creators and businesses to develop compelling storytelling approaches that effectively communicated their brand messages.",
+      "Implemented advanced editing techniques including color grading, motion graphics, and sound design to enhance visual storytelling impact.",
+      "Successfully managed multiple projects simultaneously while maintaining consistent quality standards and meeting tight deadlines with professionalism.",
+    ],
+  },
+
+  {
+    title: "Front-End Developer",
+    job: "Self-Employed",
+    date: "2022-2023", 
+    contents: [
+      "Developed responsive, user-centric web applications using modern technologies including React, JavaScript, HTML5, and CSS3 with exceptional attention to detail.",
+      "Created intuitive user interfaces that prioritized accessibility and user experience, resulting in improved engagement metrics and positive user feedback.",
+      "Collaborated with designers and stakeholders to transform creative concepts into functional, interactive web experiences that exceeded expectations.",
+      "Implemented best practices for web performance optimization, ensuring fast loading times and smooth interactions across all devices and browsers.",
+      "Continuously expanded technical knowledge by staying current with emerging front-end technologies and industry trends through dedicated learning and practice.",
     ],
   },
   {
-    title: "Back-End Developer",
-    job: "Car Manufacture",
+    title: "Back-End Developer", 
+    job: "Self-Employed",
     date: "2023-2024",
     contents: [
-      "Engineered systems for large-scale data ingestion and analysis, ensuring efficient data processing and storage.",
-      "Developed back-end systems enabling vehicle-to-cloud communication for telemetry, diagnostics, and remote control:",
-      "✅ Implemented secure APIs, following ISO 26262 automotive safety standards.",
-      "✅ Ensured data privacy for customers and partners through industry-compliant protocols.",
-      "✅ Delivered remote features like over-the-air updates, real-time tracking, and remote start capabilities.",
+      "Architected robust server-side solutions and RESTful APIs using Node.js, Python, and database technologies to support scalable web applications.",
+      "Implemented comprehensive security measures and data protection protocols, ensuring compliance with industry standards and safeguarding sensitive information.",
+      "Designed efficient database schemas and optimized query performance, resulting in improved application response times and enhanced user experiences.",
+      "Developed automated testing suites and deployment pipelines, maintaining high code quality standards and ensuring reliable, bug-free releases.",
+      "Collaborated effectively with front-end teams to create seamless full-stack solutions, fostering clear communication and successful project outcomes.",
     ],
   },
   {
-    title: "Freelance Developer",
-    job: "Self-Employed",
+    title: "Full Stack Developer",
+    job: "Self-Employed", 
     date: "2025-Present",
     contents: [
-      "Created a personal portfolio using Three.js, React, Vite, and WebAPI to showcase technical expertise.",
-      "Continuously enhancing technical skills and expanding expertise in modern web development and back-end technologies.",
+      "Currently developing comprehensive web solutions that combine cutting-edge front-end technologies with robust back-end architectures for optimal performance.",
+      "Building this stunning portfolio website using React, Three.js, GSAP, and modern web technologies to showcase technical expertise and creative vision.",
+      "Actively pursuing advanced certifications and participating in developer communities to stay at the forefront of emerging technologies and best practices.",
+      "Committed to delivering exceptional user experiences through thoughtful design, clean code, and innovative problem-solving approaches.",
     ],
   },
 ];
