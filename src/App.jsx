@@ -9,6 +9,8 @@ import CustomScrollBar from './components/CustomScrollBar'
 import Projects from './sections/Projects'
 import MyGallery from './components/animated-gallery'
 import InteractiveGallery from './components/InteractiveDoubleImage'
+import Experiences from './sections/Experiences'
+import Testimonial from './sections/Testimonial'
 
 
 
@@ -27,6 +29,8 @@ const App = () => {
       <Projects/>
       <MyGallery/>
       <InteractiveGallery/>
+      <Experiences/>
+      <Testimonial/>
 
       
 
