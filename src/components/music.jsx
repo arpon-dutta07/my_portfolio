@@ -41,26 +41,14 @@ function Music() {
 
   const togglePlay = () => {
     const audio = audioRef.current;
-    if (!audio) {
-      console.error('Audio element not found');
-      return;
-    }
-
-    console.log('Toggle play clicked. Current state:', isPlaying);
-    console.log('Audio paused:', audio.paused);
-    console.log('Audio current time:', audio.currentTime);
+    if (!audio) return;
 
     if (isPlaying) {
-      console.log('Pausing audio...');
       audio.pause();
       setIsPlaying(false);
     } else {
-      console.log('Playing audio...');
       audio.play()
-        .then(() => {
-          console.log('Audio play successful');
-          setIsPlaying(true);
-        })
+        .then(() => setIsPlaying(true))
         .catch((err) => {
           console.error('Play failed:', err);
           setIsPlaying(false);
@@ -71,16 +59,7 @@ function Music() {
   return (
     <>
       {/* Background music */}
-      <audio 
-        ref={audioRef} 
-        src="/audio.mp3" 
-        loop 
-        preload="auto"
-        onLoadStart={() => console.log('Audio loading started')}
-        onCanPlay={() => console.log('Audio can play')}
-        onError={(e) => console.error('Audio error:', e)}
-        onLoadedData={() => console.log('Audio data loaded')}
-      />
+      <audio ref={audioRef} src="/audio.mp3" loop />
 
       {/* Floating control - ONLY CHANGED THE POSITIONING CLASSES */}
       <div className="fixed top-6 right-4 sm:right-6 z-[999]">
@@ -90,23 +69,17 @@ function Music() {
           title={isPlaying ? 'Pause Music' : 'Play Music'}
           aria-label={isPlaying ? 'Pause music' : 'Play music'}
         >
-          {/* Music control icons */}
+          {/* Wave animation when playing */}
           {isPlaying ? (
-            <>
-              {/* Pause icon */}
-              <svg 
-                width="24" 
-                height="24" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                className="text-black w-5 h-5 sm:w-6 sm:h-6"
-              >
-                <path d="M6 4H10V20H6V4ZM14 4H18V20H14V4Z" fill="currentColor"/>
-              </svg>
-            </>
+            <div className="flex gap-[2px] sm:gap-[3px] absolute">
+              <div className="w-[3px] h-3 sm:w-[4px] sm:h-4 bg-black animate-wave" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-[3px] h-4 sm:w-[4px] sm:h-6 bg-black animate-wave" style={{ animationDelay: '100ms' }}></div>
+              <div className="w-[3px] h-3.5 sm:w-[4px] sm:h-5 bg-black animate-wave" style={{ animationDelay: '200ms' }}></div>
+              <div className="w-[3px] h-5 sm:w-[4px] sm:h-7 bg-black animate-wave" style={{ animationDelay: '300ms' }}></div>
+            </div>
           ) : (
             <>
-              {/* Play icon */}
+              {/* Play icon (replaced remix icon with SVG) */}
               <svg 
                 width="24" 
                 height="24" 
