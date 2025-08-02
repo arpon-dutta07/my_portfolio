@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useRef, forwardRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useSpring, useMotionValue, useAnimation } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, useMotionValue, useAnimation, useInView } from 'framer-motion';
 
 const SPRING_CONFIG = {
   type: "spring",
@@ -435,6 +435,8 @@ export default function MyGallery() {
   const mouseY = useMotionValue(0);
   const [stars, setStars] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+  const titleRef = useRef(null);
+  const isInView = useInView(titleRef, { once: true, margin: "-50px" });
 
   // Check if device is mobile
   useEffect(() => {
@@ -514,47 +516,40 @@ export default function MyGallery() {
 
       <ContainerScroll>
         <div className="flex flex-col items-center justify-center py-10 md:py-16 lg:py-20 px-2 md:px-4">
-          {/* Spectacular title with multiple effects */}
-          <motion.div className="relative mb-10 md:mb-16 lg:mb-20">
-            <motion.h1 
-              className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-center relative z-10 px-2"
-              initial={{ opacity: 0, y: isMobile ? 20 : 50, scale: isMobile ? 0.8 : 0.5 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: isMobile ? 1 : 1.5, ease: "easeOut" }}
+          {/* Stunning Title */}
+          <motion.div 
+            ref={titleRef}
+            className="relative z-10 text-center mb-16"
+          >
+            <motion.h2 
+              className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 relative"
+              initial={{ opacity: 0, y: 50 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+              transition={{ duration: 1, ease: "easeOut" }}
             >
-              <motion.span
-                className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
-                animate={{
-                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-                style={{
-                  backgroundSize: "200% 200%",
-                }}
-              >
+              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
                 Edited Photography Showcase
-              </motion.span>
-            </motion.h1>
+              </span>
+              
+              {/* Glowing Shadow */}
+              <span className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent blur-lg opacity-50">
+                Edited Photography Showcase
+              </span>
+            </motion.h2>
             
-            {/* Glowing shadow - reduced on mobile */}
-            <motion.h1 
-              className="absolute inset-0 text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-center text-purple-400 blur-lg opacity-50 px-2"
-              animate={{
-                scale: [1, isMobile ? 1.02 : 1.05, 1],
-                opacity: [0.3, isMobile ? 0.5 : 0.7, 0.3],
-              }}
-              transition={{
-                duration: isMobile ? 1.5 : 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+            {/* Animated Divider */}
+            <motion.div 
+              className="flex justify-center items-center space-x-4 mb-8"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
             >
-              Edited Photography Showcase
-            </motion.h1>
+              <div className="w-16 h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent animate-pulse"></div>
+              <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-bounce"></div>
+              <div className="w-32 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 animate-pulse"></div>
+              <div className="w-3 h-3 bg-gradient-to-r from-pink-500 to-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-16 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse"></div>
+            </motion.div>
           </motion.div>
 
           {/* Animated divider */}

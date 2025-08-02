@@ -1,5 +1,6 @@
 
 import React, { useRef } from 'react'
+import { motion, useInView } from "framer-motion";
 import Card from '../components/Card'
 import { Globe } from '../components/globe';
 import CopyEmailButton from '../components/CopyEmailButton';
@@ -10,6 +11,9 @@ import BackgroundVideo from '../components/BackgroundVideo'; // Adjust path as n
 
 const About = () => {
     const grid2Container = useRef();
+    const titleRef = useRef(null);
+    const isInView = useInView(titleRef, { once: true, margin: "-50px" });
+    
   return (
     <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw] px-4 sm:px-8">
     <BackgroundVideo
@@ -17,7 +21,41 @@ const About = () => {
       fallbackImage="/assets/space.jpg"
     >
     <section className=' relative c-space section-spacing' >
-      <h2 className='text-heading text-xl font-bold transition-colors text-gray-300 hover:text-white' >About Me</h2>
+      {/* Stunning Title */}
+      <motion.div 
+        ref={titleRef}
+        className="relative z-10 text-center mb-16"
+      >
+        <motion.h2 
+          className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 relative"
+          initial={{ opacity: 0, y: 50 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
+          <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+            About Me
+          </span>
+          
+          {/* Glowing Shadow */}
+          <span className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent blur-lg opacity-50">
+            About Me
+          </span>
+        </motion.h2>
+        
+        {/* Animated Divider */}
+        <motion.div 
+          className="flex justify-center items-center space-x-4 mb-8"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <div className="w-16 h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent animate-pulse"></div>
+          <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-bounce"></div>
+          <div className="w-32 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 animate-pulse"></div>
+          <div className="w-3 h-3 bg-gradient-to-r from-pink-500 to-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+          <div className="w-16 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse"></div>
+        </motion.div>
+      </motion.div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:auto-rows-[18rem] mt-12">
         {/* Grid 1 */}
         <div className="flex items-end grid-default-color grid-1 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:text-cyan-300 hover:drop-shadow-[0_0_12px_rgba(34,211,238,0.8)] ">

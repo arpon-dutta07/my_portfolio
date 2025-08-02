@@ -3,13 +3,60 @@ import { motion } from "framer-motion";
 import Music from "../components/music";
 import { SparklesCore } from "../components/ui/sparkles";
 
-function Navigation() {
+function Navigation({ onNavClick }) {
+  const handleNavClick = (e, targetId) => {
+    e.preventDefault();
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+      // Close mobile menu if callback is provided
+      if (onNavClick) {
+        onNavClick();
+      }
+    }
+  };
+
   return (
     <ul className="nav-ul flex items-center gap-6">
-      <li className="nav-li"><a className="nav-link" href="#home">Home</a></li>
-      <li className="nav-li"><a className="nav-link" href="#about">About</a></li>
-      <li className="nav-li"><a className="nav-link" href="#work">Work</a></li>
-      <li className="nav-li"><a className="nav-link" href="#contact">Contact</a></li>
+      <li className="nav-li">
+        <a 
+          className="nav-link" 
+          href="#home"
+          onClick={(e) => handleNavClick(e, 'home')}
+        >
+          Home
+        </a>
+      </li>
+      <li className="nav-li">
+        <a 
+          className="nav-link" 
+          href="#about"
+          onClick={(e) => handleNavClick(e, 'about')}
+        >
+          About
+        </a>
+      </li>
+      <li className="nav-li">
+        <a 
+          className="nav-link" 
+          href="#work"
+          onClick={(e) => handleNavClick(e, 'work')}
+        >
+          Work
+        </a>
+      </li>
+      <li className="nav-li">
+        <a 
+          className="nav-link" 
+          href="#contact"
+          onClick={(e) => handleNavClick(e, 'contact')}
+        >
+          Contact
+        </a>
+      </li>
     </ul>
   );
 }
@@ -75,7 +122,7 @@ const Navbar = () => {
           style={{ maxHeight: "100vh" }}
         >
           <nav className="pb-5">
-            <Navigation />
+            <Navigation onNavClick={() => setIsOpen(false)} />
           </nav>
         </motion.div>
       )}

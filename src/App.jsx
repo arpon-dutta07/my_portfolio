@@ -11,6 +11,8 @@ import MyGallery from './components/animated-gallery'
 import InteractiveGallery from './components/InteractiveDoubleImage'
 import Experiences from './sections/Experiences'
 import Testimonial from './sections/Testimonial'
+import Contact from './sections/Contact'
+import Footer from './components/Footer'
 
 
 
@@ -21,21 +23,26 @@ const App = () => {
     <div className='container mx-auto max-w-7xl'>
       <SmoothCursor/>
       <Navbar/>
-      <Hero/> 
+      <div id="home">
+        <Hero/> 
+      </div>
     </div>     
-      <About/>
+      <div id="about">
+        <About/>
+      </div>
       <DancehausScroll/>
       <ParticleTextEffect/>
-      <Projects/>
+      <div id="work">
+        <Projects/>
+      </div>
       <MyGallery/>
       <InteractiveGallery/>
       <Experiences/>
       <Testimonial/>
-
-      
-
-
-
+      <div id="contact">
+        <Contact/>
+      </div>
+      <Footer/>
     </div>
   )
 }
