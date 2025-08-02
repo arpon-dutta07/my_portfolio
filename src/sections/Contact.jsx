@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import Alert from "../components/Alert";
@@ -14,7 +14,17 @@ const Contact = () => {
   const [alertType, setAlertType] = useState("success");
   const [alertMessage, setAlertMessage] = useState("");
   const titleRef = useRef(null);
+  const videoRef = useRef(null);
   const isInView = useInView(titleRef, { once: false, margin: "-100px" });
+
+  // Auto-play video when section comes into view
+  useEffect(() => {
+    if (isInView && videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.log("Video autoplay failed:", error);
+      });
+    }
+  }, [isInView]);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -100,71 +110,115 @@ const Contact = () => {
         </motion.div>
       </motion.div>
 
-      <div className="flex flex-col items-center justify-center max-w-md p-5 mx-auto border border-white/10 rounded-2xl bg-primary">
-        <div className="flex flex-col items-start w-full gap-5 mb-10">
-          <h2 className="text-heading">Let's Talk</h2>
-          <p className="font-normal text-neutral-400">
-            Whether you're loking to build a new website, improve your existing
-            platform, or bring a unique project to life, I'm here to help
-          </p>
+      {/* Two Column Layout - Equal Heights */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 w-full px-4 items-stretch">
+        
+        {/* Left Section - Contact Form */}
+        <div className="flex flex-col items-center justify-center h-full w-full">
+          <div className="w-full p-6 border border-white/10 rounded-2xl bg-primary backdrop-blur-sm h-full flex flex-col justify-center">
+            <div className="flex flex-col items-start w-full gap-5 mb-8">
+              <h2 className="text-heading text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Let's Talk
+              </h2>
+              <p className="font-normal text-neutral-400 leading-relaxed">
+                Whether you're looking to build a new website, improve your existing
+                platform, or bring a unique project to life, I'm here to help
+              </p>
+            </div>
+            <form className="w-full" onSubmit={handleSubmit}>
+              <div className="mb-5">
+                <label htmlFor="name" className="feild-label">
+                  Full Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  className="field-input field-input-focus"
+                  placeholder="John Doe"
+                  autoComplete="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-5">
+                <label htmlFor="email" className="feild-label">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  className="field-input field-input-focus"
+                  placeholder="JohnDoe@email.com"
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-5">
+                <label htmlFor="message" className="feild-label">
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  type="text"
+                  rows="4"
+                  className="field-input field-input-focus"
+                  placeholder="Share your thoughts..."
+                  autoComplete="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full px-1 py-3 text-lg text-center rounded-md cursor-pointer bg-radial from-lavender to-royal hover-animation"
+              >
+                {!isLoading ? "Send Message" : "Sending..."}
+              </button>
+            </form>
+          </div>
         </div>
-        <form className="w-full" onSubmit={handleSubmit}>
-          <div className="mb-5">
-            <label htmlFor="name" className="feild-label">
-              Full Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              className="field-input field-input-focus"
-              placeholder="John Doe"
-              autoComplete="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
+
+        {/* Right Section - Video */}
+        <div className="flex flex-col items-center justify-center h-full w-full">
+          <div className="w-full h-full flex flex-col justify-center">
+            <div className="relative">
+              {/* Video Container */}
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-purple-900/20 to-pink-900/20 backdrop-blur-sm">
+                <div className="relative rounded-xl overflow-hidden bg-black/50 backdrop-blur-sm">
+                  <video
+                    ref={videoRef}
+                    className="w-full h-auto rounded-xl"
+                    muted
+                    loop
+                    playsInline
+                    controls
+                  >
+                    <source src="/assets/myself.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              </div>
+            </div>
+            
+            {/* Video Description */}
+            <div className="mt-6 text-center">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-3">
+                Meet Arpon
+              </h3>
+              <p className="text-neutral-400 leading-relaxed">
+                Get to know me better through this personal introduction. 
+                Let's connect and create something amazing together!
+              </p>
+            </div>
           </div>
-          <div className="mb-5">
-            <label htmlFor="email" className="feild-label">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              className="field-input field-input-focus"
-              placeholder="JohnDoe@email.com"
-              autoComplete="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="mb-5">
-            <label htmlFor="message" className="feild-label">
-              Message
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              type="text"
-              rows="4"
-              className="field-input field-input-focus"
-              placeholder="Share your thoughts..."
-              autoComplete="message"
-              value={formData.message}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full px-1 py-3 text-lg text-center rounded-md cursor-pointer bg-radial from-lavender to-royal hover-animation"
-          >
-            {!isLoading ? "Send" : "Sending..."}
-          </button>
-        </form>
+        </div>
       </div>
     </section>
   );
